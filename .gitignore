@@ -1,0 +1,7 @@
+node_modules/
+dist/
+src-tauri/target/
+src-tauri/gen/
+macos-swift/TypingOverlay.app/
+macos-swift/build/
+.DS_Store
