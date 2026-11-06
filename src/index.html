@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>TypingOverlay</title>
+  <link rel="stylesheet" href="css/bar.css">
+  <script type="module" src="js/bar.js"></script>
+</head>
+<body>
+  <div id="card" class="card">
+    <div class="row">
+      <div class="col" id="text">
+        <div class="stats" id="stats"></div>
+        <div class="display" id="display"></div>
+        <div class="kana" id="kana"></div>
+        <div class="romaji" id="romaji"></div>
+        <div class="progress"><div id="bar"></div></div>
+        <div class="next" id="next"></div>
+        <div class="hint" id="hint"></div>
+      </div>
+      <div class="kbd" id="kbd"></div>
+    </div>
+    <div class="controls" id="controls">
+      <div class="seg" id="modes"></div>
+      <button id="btn-analytics" title="統計・分析 (⌘S / Ctrl+S)">📊</button>
+      <button id="btn-settings" title="設定 (⌘, / Ctrl+,)">⚙︎</button>
+      <button id="btn-hide" title="隠す（Ctrl+Alt+T / トレイで再表示）">✕</button>
+    </div>
+    <div class="toast" id="toast"></div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>設定</title>
+  <link rel="stylesheet" href="css/window.css">
+  <style>
+    body { padding: 18px; }
+    section { margin-bottom: 14px; }
+    section > h2 { margin: 0 0 8px 2px; color: var(--ink2); font-size: 12px; }
+    .card { display: flex; flex-direction: column; gap: 12px; }
+    .line { display: flex; align-items: center; gap: 10px; min-height: 26px; }
+    .line > label:first-child { width: 120px; flex: none; color: var(--ink); }
+    .line input[type=range] { flex: 1; }
+    .val { width: 34px; text-align: right; color: var(--ink2); font-variant-numeric: tabular-nums; }
+    .note { font-size: 11px; color: var(--muted); line-height: 1.5; }
+    .kv { display: flex; justify-content: space-between; color: var(--ink2); }
+    .kv b { color: var(--ink); font-weight: 600; }
+    pre { margin: 0; font: 11px/1.7 ui-monospace, Menlo, Consolas, monospace; color: var(--ink2); white-space: pre-wrap; }
+    .btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  </style>
+  <script type="module" src="js/settings.js"></script>
+</head>
+<body>
+  <section><h2>見た目</h2><div class="card" id="look"></div></section>
+  <section><h2>練習</h2><div class="card" id="practice"></div></section>
+  <section><h2>サウンド</h2><div class="card" id="sound"></div></section>
+  <section><h2>記録</h2><div class="card" id="records"></div></section>
+  <section><h2>ショートカット</h2><div class="card"><pre id="keys"></pre></div></section>
+</body>
+</html>
