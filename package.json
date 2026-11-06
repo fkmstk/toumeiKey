@@ -1,10 +1,11 @@
 {
   "name": "typing-overlay",
   "private": true,
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "動画を見ながらタッチタイピングを練習できる半透明オーバーレイ（macOS / Windows）",
   "type": "module",
   "scripts": {
+    "tauri": "tauri",
     "dev": "tauri dev",
     "build": "tauri build",
     "test": "node tests/romaji.test.mjs",
