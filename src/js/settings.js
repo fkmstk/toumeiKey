@@ -56,6 +56,7 @@ function render() {
   $("look").innerHTML =
     `<div class="line"><label>フォント</label>${seg("fontTheme", LABELS.fontTheme)}</div>` +
     `<div class="line"><label>現在位置の表示</label>${seg("cursorStyle", LABELS.cursorStyle)}</div>` +
+    range("uiScale", "全体の大きさ", 0.6, 1.3, 0.05, pct) +
     range("fontSize", "文字サイズ", 16, 56, 1) +
     range("bgOpacity", "背景の濃さ", 0, 0.95, 0.01, pct) +
     range("textOpacity", "全体の濃さ", 0.2, 1, 0.01, pct) +

@@ -18,6 +18,7 @@ export const DEFAULTS = {
   bgOpacity: 0.4,
   textOpacity: 0.95,
   fontSize: 26,
+  uiScale: 0.85,             // 帯全体の大きさ（文字・余白・キーボード・ボタンをまとめて拡大縮小）
   fontTheme: "modern",       // modern | round | textbook | system
   cursorStyle: "underline",  // underline | color | box
   showKeyboard: true,

@@ -31,6 +31,8 @@ function applyStyle() {
   r.setProperty("--bg-opacity", s.bgOpacity);
   r.setProperty("--text-opacity", s.textOpacity);
   r.setProperty("--fs", `${s.fontSize}px`);
+  $("card").style.zoom = s.uiScale;
+  requestAnimationFrame(fitHeight);
   r.setProperty("--jp", f.jp);
   r.setProperty("--jp-weight", f.jpWeight);
   r.setProperty("--mono", f.mono);
@@ -139,10 +141,12 @@ function toast(msg) {
 // ---------- 高さを内容に合わせる ----------
 
 let lastH = 0;
-new ResizeObserver(() => {
+function fitHeight() {
   const h = Math.ceil($("card").getBoundingClientRect().height);
   if (Math.abs(h - lastH) > 0.5) { lastH = h; invoke("fit_height", { height: h }); }
-}).observe($("card"));
+}
+// zoom の変更では ResizeObserver が呼ばれないので、設定反映時にも fitHeight を呼ぶ
+new ResizeObserver(fitHeight).observe($("card"));
 
 // ---------- 音 ----------
 
