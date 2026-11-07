@@ -340,12 +340,16 @@ pub fn run() {
                     "quit" => quit_app(app),
                     _ => {}
                 });
-            if let Some(icon) = app.default_window_icon() {
-                tray = tray.icon(icon.clone());
-            }
+            // macOS: メニューバーの他のアイコンと揃う単色のテンプレート画像（明るい/暗いメニューバーで自動で色が変わる）
+            // Windows: タスクトレイはカラーのアプリアイコン（黒い単色だと暗いタスクバーで見えなくなる）
             #[cfg(target_os = "macos")]
             {
-                tray = tray.icon_as_template(false);
+                let icon = tauri::image::Image::from_bytes(include_bytes!("../icons/tray-template.png"))?;
+                tray = tray.icon(icon).icon_as_template(true);
+            }
+            #[cfg(not(target_os = "macos"))]
+            if let Some(icon) = app.default_window_icon() {
+                tray = tray.icon(icon.clone());
             }
             tray.build(app)?;
             Ok(())
