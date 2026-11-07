@@ -200,9 +200,10 @@ async function pasteCustom() {
 
 async function openFile() {
   if (!T) return;
-  const path = await T.dialog.open({ multiple: false, filters: [{ name: "テキスト", extensions: ["txt", "md", "csv"] }] });
-  if (!path) return;
-  try { loadCustom(await invoke("read_text_file", { path })); } catch (e) { toast("読み込めませんでした: " + e); }
+  try {
+    const text = await invoke("pick_text_file");
+    if (text != null) loadCustom(text);
+  } catch (e) { toast("読み込めませんでした: " + e); }
   win?.setFocus();
 }
 

@@ -293,13 +293,10 @@ document.addEventListener("click", (e) => {
 
 $("csv").onclick = async () => {
   if (!T) { console.log(a.linesCSV()); return; }
-  const path = await T.dialog.save({ defaultPath: "typing-lines.csv", filters: [{ name: "CSV", extensions: ["csv"] }] });
-  if (!path) return;
-  const keysPath = path.replace(/[^/\\]*$/, "typing-keys.csv");
   try {
-    await T.core.invoke("write_text_file", { path, contents: "﻿" + a.linesCSV() });
-    await T.core.invoke("write_text_file", { path: keysPath, contents: "﻿" + a.keysCSV() });
-    await T.dialog.message(`書き出しました\n${path}\n${keysPath}`, { title: "CSV 書き出し" });
+    const paths = await T.core.invoke("export_csv", { lines: a.linesCSV(), keys: a.keysCSV() });
+    if (!paths) return;
+    await T.dialog.message(`書き出しました\n${paths.join("\n")}`, { title: "CSV 書き出し" });
   } catch (err) { await T.dialog.message(String(err), { title: "書き出せませんでした", kind: "error" }); }
 };
 

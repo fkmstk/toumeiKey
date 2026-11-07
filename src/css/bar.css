@@ -61,7 +61,7 @@ body { display: flex; flex-direction: column; justify-content: flex-end; height:
 .hint button { font-size: 11px; padding: 1px 10px; border-radius: var(--r-pill); }
 
 /* キーボードガイド */
-.kbd { padding-top: 26px; display: flex; flex-direction: column; gap: 2px; }
+.kbd { padding-top: 38px; display: flex; flex-direction: column; gap: 2px; }
 .kbd:empty { display: none; }
 .kbd .r { display: flex; gap: 2px; }
 .kbd .key {
@@ -75,9 +75,12 @@ body { display: flex; flex-direction: column; justify-content: flex-end; height:
 /* ホバー時の操作 */
 .controls {
   position: absolute; top: 8px; right: 8px; display: flex; gap: 4px; align-items: center;
-  padding: 3px; border-radius: var(--r-md); background: var(--glass); border: 1px solid var(--line);
+  padding: 3px; border-radius: var(--r-md);
+  /* 帯と同じく背景は持たず、文字と同じ影で動画の上でも読めるようにする */
+  text-shadow: 0 1px 1.5px rgba(0, 0, 0, 0.75);
   opacity: 0.35; transition: opacity 0.15s ease;
 }
+.controls .ico { filter: drop-shadow(0 1px 1.2px rgba(0, 0, 0, 0.75)); }
 .card.hover .controls, .card.focused .controls, .controls:hover { opacity: 1; }
 .controls .seg { border: 0; background: none; padding: 0; }
 .controls .seg button { font-size: 11px; padding: 3px 9px; }

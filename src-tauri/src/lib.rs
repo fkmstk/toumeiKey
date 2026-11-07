@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
 use tauri::tray::TrayIconBuilder;
 use tauri::{AppHandle, Emitter, Manager, PhysicalPosition, PhysicalSize, WebviewUrl, WebviewWindow, WebviewWindowBuilder, WindowEvent};
+use tauri_plugin_dialog::DialogExt;
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 
 /// 帯の位置と幅（次回起動時に復元）
@@ -25,14 +26,35 @@ struct AppState {
 
 // MARK: - コマンド（JS から呼ぶ）
 
+// ファイルの場所は JS から受け取らない。必ずユーザーがダイアログで選んだファイルだけを読み書きする
+// （画面側にスクリプトが紛れ込んでも、任意のファイルを読んだり書き換えたりできないように）
+
+/// カスタム文に使うテキストファイルを選ばせて中身を返す。キャンセルなら None
 #[tauri::command]
-fn read_text_file(path: String) -> Result<String, String> {
-    std::fs::read_to_string(&path).map_err(|e| e.to_string())
+async fn pick_text_file(app: AppHandle, window: WebviewWindow) -> Result<Option<String>, String> {
+    let Some(picked) = app.dialog().file().set_parent(&window).add_filter("テキスト", &["txt", "md", "csv"]).blocking_pick_file() else {
+        return Ok(None);
+    };
+    let path = picked.into_path().map_err(|e| e.to_string())?;
+    let len = std::fs::metadata(&path).map_err(|e| e.to_string())?.len();
+    if len > 5 * 1024 * 1024 {
+        return Err("ファイルが大きすぎます（5MB まで）".into());
+    }
+    std::fs::read_to_string(&path).map(Some).map_err(|e| e.to_string())
 }
 
+/// 保存先を選ばせて、行ごとの記録とキー別の記録を CSV で書き出す。書き出したパスを返す（キャンセルなら None）
 #[tauri::command]
-fn write_text_file(path: String, contents: String) -> Result<(), String> {
-    std::fs::write(&path, contents).map_err(|e| e.to_string())
+async fn export_csv(app: AppHandle, window: WebviewWindow, lines: String, keys: String) -> Result<Option<Vec<String>>, String> {
+    let Some(picked) = app.dialog().file().set_parent(&window).set_file_name("typing-lines.csv").add_filter("CSV", &["csv"]).blocking_save_file() else {
+        return Ok(None);
+    };
+    let path = picked.into_path().map_err(|e| e.to_string())?;
+    let keys_path = path.with_file_name("typing-keys.csv");
+    // Excel で文字化けしないよう BOM を付ける
+    std::fs::write(&path, format!("\u{feff}{lines}")).map_err(|e| e.to_string())?;
+    std::fs::write(&keys_path, format!("\u{feff}{keys}")).map_err(|e| e.to_string())?;
+    Ok(Some(vec![path.display().to_string(), keys_path.display().to_string()]))
 }
 
 /// 内容の高さに合わせて帯を伸縮する（下端を固定して上に伸びる。画面からはみ出さない）
@@ -259,8 +281,8 @@ pub fn run() {
                 .build(),
         )
         .invoke_handler(tauri::generate_handler![
-            read_text_file,
-            write_text_file,
+            pick_text_file,
+            export_csv,
             fit_height,
             open_window,
             toggle_focus_cmd,
