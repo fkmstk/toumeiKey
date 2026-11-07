@@ -12,6 +12,7 @@ Windows / macOS 対応・無料・アカウント登録なし。
 [![Release](https://img.shields.io/github/v/release/fkmstk/toumeiKey?label=%E6%9C%80%E6%96%B0%E7%89%88&color=3987e5)](https://github.com/fkmstk/toumeiKey/releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/fkmstk/toumeiKey/total?label=%E3%83%80%E3%82%A6%E3%83%B3%E3%83%AD%E3%83%BC%E3%83%89&color=199e70)](https://github.com/fkmstk/toumeiKey/releases)
 ![Platforms](https://img.shields.io/badge/Windows%20%7C%20macOS-555)
+[![License](https://img.shields.io/github/license/fkmstk/toumeiKey?color=555)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/fkmstk/toumeiKey?style=social)](https://github.com/fkmstk/toumeiKey/stargazers)
 
 [**⬇ ダウンロード**](#ダウンロード) ・ [使い方](#使い方) ・ [機能](#機能) ・ [English](README.en.md)
@@ -235,3 +236,7 @@ macos-swift/         最初に作った macOS ネイティブ（Swift / AppKit�
 | 銀河鉄道の夜 | 「銀河鉄道の夜」角川文庫、角川書店 |
 
 [Tauri](https://tauri.app/) で作られています。
+
+## ライセンス
+
+[MIT License](LICENSE) — 自由に使用・改変・再配布できます。小説の本文は著作権の切れた作品で、青空文庫の[収録ファイルの取り扱い規準](https://www.aozora.gr.jp/guide/kijyunn.html)に従っています。

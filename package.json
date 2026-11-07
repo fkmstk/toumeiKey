@@ -2,6 +2,7 @@
   "name": "typing-overlay",
   "private": true,
   "version": "2.1.0",
+  "license": "MIT",
   "description": "動画を見ながらタッチタイピングを練習できる半透明オーバーレイ（macOS / Windows）",
   "type": "module",
   "scripts": {

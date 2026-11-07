@@ -12,6 +12,7 @@ Windows & macOS · free · no account.
 [![Release](https://img.shields.io/github/v/release/fkmstk/toumeiKey?color=3987e5)](https://github.com/fkmstk/toumeiKey/releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/fkmstk/toumeiKey/total?color=199e70)](https://github.com/fkmstk/toumeiKey/releases)
 ![Platforms](https://img.shields.io/badge/Windows%20%7C%20macOS-555)
+[![License](https://img.shields.io/github/license/fkmstk/toumeiKey?color=555)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/fkmstk/toumeiKey?style=social)](https://github.com/fkmstk/toumeiKey/stargazers)
 
 [**⬇ Download**](#download) · [Usage](#usage) · [Features](#features) · [日本語](README.md)
@@ -105,3 +106,7 @@ Bug reports, ideas and pull requests are welcome — open an [issue](https://git
 ## Credits
 
 Novel texts come from [Aozora Bunko](https://www.aozora.gr.jp/) (public-domain works). Readings combine Aozora's ruby with automatic morphological analysis ([fugashi](https://github.com/polm/fugashi) + UniDic) and may occasionally be wrong. Built with [Tauri](https://tauri.app/).
+
+## License
+
+[MIT](LICENSE). The novel texts are public-domain works distributed under [Aozora Bunko's terms](https://www.aozora.gr.jp/guide/kijyunn.html).
