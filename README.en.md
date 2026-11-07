@@ -38,7 +38,7 @@ Typing drills get boring fast. toumeiKey turns the time you already spend watchi
 | 📖 **Classic novels** | Six public-domain Japanese novels, one sentence at a time, resuming where you left off |
 | 🎹 **Keyboard guide** | Shows the next key and which finger to use; auto-detects JIS / US layouts |
 | 🔊 **Satisfying key sounds** | Five synthesized sound sets, panned left/right by hand |
-| 📊 **Real analytics** | KPM trend, per-key heatmap, weakest keys, common mistypes, CSV export |
+| 📊 **Real analytics** | Practice calendar, "finger or position?" mistake diagnosis, KPM trend & distribution, per-key heatmap, time-of-day heatmap, CSV export |
 | 🔒 **Offline** | Everything stays on your machine. No account, no network |
 
 KPM only counts the time you are actually typing, so pausing to watch doesn't hurt your score.
@@ -46,6 +46,8 @@ KPM only counts the time you are actually typing, so pausing to watch doesn't hu
 <img src="docs/images/mode-english.png" width="760" alt="English mode">
 
 <img src="docs/images/analytics.png" width="760" alt="Analytics window">
+
+<img src="docs/images/analytics-cause.png" width="760" alt="Mistake diagnosis: miss rate by finger and row, and mistype categories">
 
 You can also practice your own text: paste from the clipboard or open a text file (one line per prompt).
 

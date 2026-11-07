@@ -1,8 +1,8 @@
 // 統計・分析ウィンドウ。グラフは SVG で描画（外部ライブラリなし）。
 // 配色はダーク面 #17171b 用の参照パレット。単一系列のグラフは指標ごとに1色、ヒートマップは青の単色ランプ。
 import * as store from "./store.js";
-import { Analytics, stat, day, formatDuration } from "./analytics.js";
-import { rows, lookup, FINGER_NAMES, FINGER_COLORS } from "./keyboard.js";
+import { Analytics, stat, day, dayKey, formatDuration } from "./analytics.js";
+import { rows, lookup, FINGER_NAMES, FINGER_COLORS, ROW_NAMES } from "./keyboard.js";
 
 const T = window.__TAURI__;
 const $ = (id) => document.getElementById(id);
@@ -17,6 +17,7 @@ const MODE_LABEL = { japanese: "日本語", english: "English", novel: "小説",
 
 let range = "week";   // week | month | all
 let heat = "miss";    // miss | speed
+let when = "count";   // count | kpm（時間帯ヒートマップ）
 const RANGES = { week: ["7日", 7], month: ["30日", 30], all: ["全期間", null] };
 
 // ---------- ツールチップ ----------
@@ -31,6 +32,13 @@ function showTip(e, lines) {
   tip.style.left = `${x}px`; tip.style.top = `${y}px`;
 }
 const hideTip = () => { tip.style.display = "none"; };
+// data-tip を持つ要素（カレンダーのマス・ヒートマップのセルなど）は共通のツールチップで説明を出す
+let tipByData = false;
+document.addEventListener("mousemove", (e) => {
+  const t = e.target.closest && e.target.closest("[data-tip]");
+  if (t) { showTip(e, t.getAttribute("data-tip").split("\n")); tipByData = true; }
+  else if (tipByData) { hideTip(); tipByData = false; }
+});
 
 // ---------- 軸 ----------
 function niceTicks(lo, hi, n = 4) {
@@ -165,6 +173,8 @@ function render() {
     tile("練習時間", formatDuration(cur.sec), cmp, dT) + tile("打鍵数", cur.keys.toLocaleString(), `${lines.length} 行`) +
     tile("ベスト KPM", String(best), "この期間の1行") + tile("連続練習", `${a.streak} 日`, `今日 ${formatDuration(a.today.activeSec)}`) + `</div>`;
 
+  html += calendarCard();
+
   // KPM の推移
   const pts = []; const win = [];
   lines.forEach((l) => { win.push(l.kpm); if (win.length > 10) win.shift(); pts.push({ kpm: l.kpm, avg: win.reduce((x, y) => x + y, 0) / win.length, rec: l }); });
@@ -188,10 +198,12 @@ function render() {
     value: stat.attempts(s) ? `${(stat.missRate(s) * 100).toFixed(1)}%` : "–",
     detail: stat.avgMs(s) != null ? `${stat.avgMs(s).toFixed(0)} ms` : "",
   }));
-  html += `<div class="grid2">` + card("日別の正確率", "正しく打った数 ÷ 全打鍵", `<div class="chart" id="c-dacc"></div>`) +
-    rankCard("指ごとのミス率", "右の数字は平均打鍵間隔（全期間）", fingerRows) + `</div>`;
+  html += `<div class="grid2">` + card("日別の正確率", "正しく打った数 ÷ 全打鍵", `<div class="chart" id="c-dacc"></div>`) + distCard(lines) + `</div>`;
+  html += `<div class="grid2">` + modeCard(lines) + rankCard("指ごとのミス率", "右の数字は平均打鍵間隔（全期間）", fingerRows) + `</div>`;
 
+  html += causeCard(layout);
   html += heatmap(layout);
+  html += todCard(lines);
 
   // ランキング
   const ks = Object.entries(data.keys);
@@ -220,6 +232,7 @@ function render() {
 
   $("content").innerHTML = html;
   drawCharts(pts, days);
+  drawDist(lines);
 }
 
 function drawCharts(pts, days) {
@@ -270,7 +283,7 @@ function heatmap(layout) {
   const cell = (label, s, w) => {
     const v = metric(s), t = v == null ? null : norm(v);
     const title = `${label === "space" ? "スペース" : label}  打鍵 ${s.hits} / ミス ${s.misses} (${(stat.missRate(s) * 100).toFixed(1)}%)` + (stat.avgMs(s) != null ? `  平均 ${stat.avgMs(s).toFixed(0)} ms` : "");
-    return `<div class="k" title="${esc(title)}" style="width:${w}px;background:${t == null ? C.grid : rampColor(t)};color:${t == null ? C.muted : rampInk(t)}"><b>${esc(label)}</b><i>${v == null ? "–" : fmt(v)}</i></div>`;
+    return `<div class="k" data-tip="${esc(title)}" style="width:${w}px;background:${t == null ? C.grid : rampColor(t)};color:${t == null ? C.muted : rampInk(t)}"><b>${esc(label)}</b><i>${v == null ? "–" : fmt(v)}</i></div>`;
   };
   const indent = [0, 0.5, 0.8, 1.3];
   let kb = `<div class="rows">`;
@@ -283,12 +296,228 @@ function heatmap(layout) {
   return card("キーボード ヒートマップ", sub, `<div class="heat">${kb}${legend}</div>`, sw);
 }
 
+// ---------- 練習カレンダー（過去1年・日ごとの練習時間） ----------
+const CAL_LEVELS = [5, 15, 30];                                   // 分の区切り
+const CAL_COLORS = [RAMP[1], RAMP[4], RAMP[7], RAMP[10]];         // 暗い面では明るいほど長い
+const CAL_LABELS = ["5分未満", "5〜15分", "15〜30分", "30分以上"];
+
+function calendarCard() {
+  const WEEKS = 53;
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const offset = (today.getDay() + 6) % 7;                         // 月曜はじまり
+  const start = new Date(today); start.setDate(today.getDate() - offset - (WEEKS - 1) * 7);
+  let cells = "", months = "", practiced = 0, total = 0;
+  for (let w = 0; w < WEEKS; w++) {
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(start); d.setDate(start.getDate() + w * 7 + i);
+      if (d.getDate() === 1 && d <= today) months += `<span style="grid-column:${w + 1}">${d.getMonth() + 1}月</span>`;
+      if (d > today) { cells += `<i class="fut"></i>`; continue; }
+      const s = a.data.days[dayKey(d)];
+      const min = s ? s.activeSec / 60 : 0;
+      let color = "";
+      if (min > 0) {
+        practiced++; total += s.activeSec;
+        const lv = CAL_LEVELS.findIndex((t) => min < t);
+        color = CAL_COLORS[lv === -1 ? 3 : lv];
+      }
+      const t = `${d.getFullYear()}/${wd(d)}\n${min > 0 ? `練習 ${formatDuration(s.activeSec)}  ·  ${s.lines} 行  ·  ${day.kpm(s)} KPM` : "練習なし"}`;
+      cells += `<i data-tip="${esc(t)}"${color ? ` style="background:${color}"` : ""}${d.getTime() === today.getTime() ? ` class="today"` : ""}></i>`;
+    }
+  }
+  const legend = `<div class="cal-legend"><span><i></i>練習なし</span>${CAL_LABELS.map((l, i) => `<span><i style="background:${CAL_COLORS[i]}"></i>${l}</span>`).join("")}</div>`;
+  const hero = `<div class="hero"><b>${practiced} 日</b><span>この1年で練習した日 · 合計 ${formatDuration(total)}</span></div>`;
+  const body = `<div class="cal"><div></div><div class="cal-months">${months}</div>` +
+    `<div class="cal-wd">${["月", "", "水", "", "金", "", "日"].map((x) => `<span>${x}</span>`).join("")}</div><div class="cal-grid">${cells}</div></div>${legend}`;
+  return card("練習カレンダー", "1日ごとの練習時間（打鍵していた時間）。明るいほど長く練習した日", body, hero);
+}
+
+// ---------- ミスの原因：指か、場所か ----------
+const emptyS = () => ({ hits: 0, misses: 0, totalSec: 0, timed: 0 });
+const CAUSES = {
+  row: ["段のずれ", "同じ指で、上や下の段のキーを押した", "place"],
+  side: ["横のずれ", "同じ指で、左右となりのキーを押した", "place"],
+  finger: ["指の取り違え", "同じ段で、別の指のキーを押した", "finger"],
+  hand: ["左右の取り違え", "反対の手のキーを押した", "finger"],
+  diag: ["斜めのずれ", "別の指で、別の段のキーを押した", "both"],
+};
+
+/** 打つべきキー p と実際に打ったキー q の関係を分類する */
+function classify(layout, p, q) {
+  const A = lookup(layout, p) || lookup(layout, p.toUpperCase());
+  const B = lookup(layout, q) || lookup(layout, q.toUpperCase());
+  if (!A || !B || A.key.finger > 7 || B.key.finger > 7) return null;
+  const x = A.key, y = B.key, hand = (f) => (f <= 3 ? 0 : 1);
+  if (x.finger === y.finger) return x.row === y.row ? "side" : "row";
+  if (hand(x.finger) !== hand(y.finger)) return "hand";
+  return x.row === y.row ? "finger" : "diag";
+}
+
+function causeCard(layout) {
+  // 指 × 段 のミス率
+  const M = Array.from({ length: 4 }, () => Array.from({ length: 8 }, emptyS));
+  for (const [k, s] of Object.entries(a.data.keys)) {
+    const hit = lookup(layout, k) || lookup(layout, k.toUpperCase());
+    if (!hit || hit.key.finger > 7 || hit.key.row > 3) continue;
+    M[hit.key.row][hit.key.finger] = stat.add(M[hit.key.row][hit.key.finger], s);
+  }
+  const rowT = M.map((r) => r.reduce(stat.add, emptyS()));
+  const finT = Array.from({ length: 8 }, (_, f) => M.reduce((o, r) => stat.add(o, r[f]), emptyS()));
+  const all = rowT.reduce(stat.add, emptyS());
+  const ok = (s, n = 20) => stat.attempts(s) >= n;
+  const vals = [...M.flat(), ...rowT, ...finT].filter((s) => ok(s)).map(stat.missRate);
+  const lo = vals.length ? Math.min(...vals) : 0, hi = vals.length ? Math.max(...vals) : 1;
+  const pct1 = (v) => `${(v * 100).toFixed(1)}%`;
+  const cell = (s, tipText, cls = "") => {
+    if (!ok(s)) return `<td><div class="c na ${cls}" data-tip="${esc(tipText)}\nデータ不足">–</div></td>`;
+    const v = stat.missRate(s), t = hi - lo < 1e-6 ? 0.5 : (v - lo) / (hi - lo);
+    return `<td><div class="c ${cls}" style="background:${rampColor(t)};color:${rampInk(t)}" data-tip="${esc(tipText)}\nミス ${s.misses} / ${stat.attempts(s)} 回（${pct1(v)}）">${(v * 100).toFixed(1)}</div></td>`;
+  };
+  const fname = (f) => FINGER_NAMES[f].replace(/^[左右] /, "");
+  let mx = `<table class="mx"><thead><tr><th></th><th colspan="4" class="hand">左手</th><th class="g"></th><th colspan="4" class="hand">右手</th><th class="g"></th><th></th></tr><tr><th></th>`;
+  for (let f = 0; f < 8; f++) mx += `${f === 4 ? `<th class="g"></th>` : ""}<th><span class="sw" style="background:${FINGER_COLORS[f]}"></span>${fname(f)}</th>`;
+  mx += `<th class="g"></th><th class="tot">段の合計</th></tr></thead><tbody>`;
+  M.forEach((r, ri) => {
+    mx += `<tr><th class="rl">${ROW_NAMES[ri]}</th>`;
+    r.forEach((s, f) => { mx += `${f === 4 ? `<td class="g"></td>` : ""}${cell(s, `${FINGER_NAMES[f]} × ${ROW_NAMES[ri]}`)}`; });
+    mx += `<td class="g"></td>${cell(rowT[ri], `${ROW_NAMES[ri]}（すべての指）`, "sum")}</tr>`;
+  });
+  mx += `<tr class="sumrow"><th class="rl tot">指の合計</th>`;
+  finT.forEach((s, f) => { mx += `${f === 4 ? `<td class="g"></td>` : ""}${cell(s, `${FINGER_NAMES[f]}（すべての段）`, "sum")}`; });
+  mx += `<td class="g"></td>${cell(all, "全体", "sum")}</tr></tbody></table>`;
+
+  // 打ち間違いの分類
+  const cnt = {}, ex = {};
+  let total = 0;
+  for (const [k, v] of Object.entries(a.data.confusions)) {
+    const [p, q] = k.split("→");
+    const c = classify(layout, p, q);
+    if (!c) continue;
+    cnt[c] = (cnt[c] || 0) + v; total += v;
+    (ex[c] ||= []).push([`${keyLabel(p)}→${keyLabel(q)}`, v]);
+  }
+  const share = (g) => Object.entries(cnt).filter(([c]) => CAUSES[c][2] === g).reduce((x, [, v]) => x + v, 0) / (total || 1);
+  const place = share("place"), finger = share("finger");
+  const argmax = (arr, n) => arr.reduce((b, s, i) => (ok(s, n) && (b < 0 || stat.missRate(s) > stat.missRate(arr[b])) ? i : b), -1);
+  const wf = argmax(finT, 50), wr = argmax(rowT, 50);
+  const pc = (v) => `${Math.round(v * 100)}%`;
+  let verdict;
+  if (total < 15 || wf < 0 || wr < 0) {
+    verdict = `<b>まだ判断できません。</b>打ち間違いの記録がもう少し集まると、原因が指なのか場所なのかを判定します。`;
+  } else if (place >= finger * 1.3) {
+    verdict = `<b>場所のずれが中心です。</b>打ち間違いの ${pc(place)} は、指は合っているのに段や左右の位置がずれたものでした。` +
+      `段別では <b>${ROW_NAMES[wr]}</b>（${pct1(stat.missRate(rowT[wr]))}）が最もミスしやすく、ホームポジションからの手の伸ばし方を意識すると減らせるかもしれません。`;
+  } else if (finger >= place * 1.3) {
+    verdict = `<b>指の取り違えが中心です。</b>打ち間違いの ${pc(finger)} は、正しい段で別の指が動いたものでした。` +
+      `指別では <b>${FINGER_NAMES[wf]}</b>（${pct1(stat.missRate(finT[wf]))}）が最もミスしやすく、この指を意識してゆっくり打つと減らせるかもしれません。`;
+  } else {
+    verdict = `<b>指と場所の両方が同じくらいです。</b>位置のずれが ${pc(place)}、指の取り違えが ${pc(finger)} でした。` +
+      `最もミスしやすいのは <b>${FINGER_NAMES[wf]}</b> と <b>${ROW_NAMES[wr]}</b> です。`;
+  }
+  const order = Object.keys(CAUSES).filter((c) => cnt[c]).sort((x, y) => cnt[y] - cnt[x]);
+  const list = total
+    ? `<div class="rank">${order.map((c) => `<div class="l" data-tip="${esc(CAUSES[c][1])}">${CAUSES[c][0]}</div>` +
+      `<div class="b"><div style="width:${((cnt[c] / total) * 100).toFixed(1)}%"></div></div><div class="v">${pc(cnt[c] / total)}</div>` +
+      `<div class="x">${esc(ex[c].sort((x, y) => y[1] - x[1]).slice(0, 2).map(([e]) => e).join("  "))}</div>`).join("")}</div>`
+    : `<div class="empty">打ち間違いの記録がまだありません</div>`;
+  const body = `<div class="cause"><div class="mxwrap">${mx}<div class="note2">数字はミス率（%）。20回以上打った組み合わせだけ色を付けています。明るいほどミスが多い</div></div>` +
+    `<div class="why"><div class="verdict">${verdict}</div><div class="h3">打ち間違いの種類</div>${list}</div></div>`;
+  return card("ミスの原因 — 指か、場所か", "指 × 段ごとのミス率と、打ち間違いの種類（全期間）", body);
+}
+
+// ---------- 時間帯（曜日 × 時刻） ----------
+function todCard(lines) {
+  const G = Array.from({ length: 7 }, () => Array.from({ length: 24 }, () => ({ n: 0, kpm: 0 })));
+  const byHour = Array.from({ length: 24 }, () => ({ n: 0, kpm: 0 }));
+  for (const l of lines) {
+    const d = new Date(l.date), r = (d.getDay() + 6) % 7, h = d.getHours();
+    G[r][h].n++; G[r][h].kpm += l.kpm; byHour[h].n++; byHour[h].kpm += l.kpm;
+  }
+  const metric = (c) => (when === "count" ? (c.n || null) : c.n >= 3 ? c.kpm / c.n : null);
+  const vals = G.flat().map(metric).filter((v) => v != null);
+  const lo = when === "count" ? 0 : vals.length ? Math.min(...vals) : 0, hi = vals.length ? Math.max(...vals) : 1;
+  const W = ["月", "火", "水", "木", "金", "土", "日"];
+  let g = `<div class="tod"><span></span>${Array.from({ length: 24 }, (_, h) => `<span class="hh">${h % 3 === 0 ? h : ""}</span>`).join("")}`;
+  G.forEach((row, r) => {
+    g += `<span class="wd">${W[r]}</span>`;
+    row.forEach((c, h) => {
+      const v = metric(c), t = v == null ? null : hi - lo < 1e-6 ? 1 : (v - lo) / (hi - lo);
+      const tipText = `${W[r]}曜 ${h}時台\n${c.n ? `${c.n} 行 · 平均 ${Math.round(c.kpm / c.n)} KPM` : "記録なし"}`;
+      g += `<i data-tip="${esc(tipText)}"${t == null ? "" : ` style="background:${rampColor(0.15 + t * 0.85)}"`}></i>`;
+    });
+  });
+  g += `</div>`;
+  const most = byHour.reduce((b, c, h) => (c.n > (byHour[b]?.n || 0) ? h : b), -1);
+  const fast = byHour.reduce((b, c, h) => (c.n >= 5 && (b < 0 || c.kpm / c.n > byHour[b].kpm / byHour[b].n) ? h : b), -1);
+  const insight = !lines.length ? "この期間の記録はありません"
+    : `よく練習するのは <b>${most}時台</b>${fast >= 0 ? `、いちばん速いのは <b>${fast}時台</b>（平均 ${Math.round(byHour[fast].kpm / byHour[fast].n)} KPM）` : ""}です。`;
+  const sw = `<div class="seg"><button data-w="count" class="${when === "count" ? "on" : ""}">練習量</button><button data-w="kpm" class="${when === "kpm" ? "on" : ""}">速さ</button></div>`;
+  const sub = when === "count" ? "選んだ期間に、その時間帯に打った行数。明るいほど多い" : "その時間帯の平均 KPM（3行以上）。明るいほど速い";
+  return card("いつ練習している？", sub, `${g}<div class="insight">${insight}</div>`, sw);
+}
+
+// ---------- KPM の分布 ----------
+function distCard(lines) {
+  if (lines.length < 5) return card("KPM の分布", "選んだ期間の各行の KPM", `<div class="empty">5行以上打つと表示されます</div>`);
+  const ks = lines.map((l) => l.kpm).sort((x, y) => x - y);
+  const med = ks[Math.floor(ks.length / 2)];
+  return card("KPM の分布", "選んだ期間の各行の KPM。破線は中央値", `<div class="chart" id="c-dist"></div>`,
+    `<div class="hero"><b>${med}</b><span>中央値 KPM</span></div>`);
+}
+
+function drawDist(lines) {
+  const el = $("c-dist");
+  if (!el) return;
+  const ks = lines.map((l) => l.kpm).sort((x, y) => x - y);
+  const med = ks[Math.floor(ks.length / 2)], lo = ks[0], hi = ks[ks.length - 1];
+  const step = [2, 5, 10, 20, 25, 50, 100].find((s) => (hi - lo) / s <= 20) || 100;
+  const b0 = Math.floor(lo / step) * step, nb = Math.floor((hi - b0) / step) + 1;
+  const bins = Array(nb).fill(0);
+  ks.forEach((k) => bins[Math.min(nb - 1, Math.floor((k - b0) / step))]++);
+  const W = Math.max(200, el.clientWidth), H = 180, m = { l: 6, r: 38, t: 10, b: 22 };
+  const iw = W - m.l - m.r, ih = H - m.t - m.b, band = iw / nb, bw = Math.max(2, band - 2);
+  const top = Math.max(1, ...bins) * 1.1;
+  const X = (v) => m.l + ((v - b0) / (nb * step)) * iw, Y = (v) => m.t + ih - (v / top) * ih;
+  let s = `<svg width="${W}" height="${H}">`;
+  for (const t of niceTicks(0, top)) {
+    s += `<line x1="${m.l}" x2="${m.l + iw}" y1="${Y(t)}" y2="${Y(t)}" stroke="${C.grid}"/><text x="${m.l + iw + 6}" y="${Y(t) + 3}">${t}</text>`;
+  }
+  s += `<line x1="${m.l}" x2="${m.l + iw}" y1="${m.t + ih}" y2="${m.t + ih}" stroke="${C.baseline}"/>`;
+  const every = Math.max(1, Math.ceil(nb / Math.max(2, Math.floor(iw / 56))));
+  bins.forEach((c, i) => {
+    const x = m.l + band * i + 1, y = Y(c), h = m.t + ih - y, r = Math.min(3, bw / 2, h);
+    if (c) s += `<path fill="${C.kpm}" d="M${x},${m.t + ih} V${y + r} Q${x},${y} ${x + r},${y} H${x + bw - r} Q${x + bw},${y} ${x + bw},${y + r} V${m.t + ih} Z"/>`;
+    s += `<rect x="${m.l + band * i}" y="${m.t}" width="${band}" height="${ih}" fill="transparent" data-tip="${b0 + step * i}〜${b0 + step * (i + 1) - 1} KPM\n${c} 行（${Math.round((c / ks.length) * 100)}%）"/>`;
+    if (i % every === 0) s += `<text x="${m.l + band * i}" y="${H - 6}" text-anchor="middle">${b0 + step * i}</text>`;
+  });
+  const mx = X(med + 0.5);
+  s += `<line x1="${mx}" x2="${mx}" y1="${m.t - 4}" y2="${m.t + ih}" stroke="${C.muted}" stroke-dasharray="3 3" pointer-events="none"/>`;
+  s += `</svg>`;
+  el.innerHTML = s;
+}
+
+// ---------- モード別 ----------
+function modeCard(lines) {
+  const g = {};
+  for (const l of lines) {
+    const o = (g[l.mode] ||= { n: 0, kpm: 0, keys: 0, misses: 0 });
+    o.n++; o.kpm += l.kpm; o.keys += l.keys; o.misses += l.misses;
+  }
+  const rws = Object.entries(g).map(([mo, o]) => ({ mo, kpm: Math.round(o.kpm / o.n), acc: o.keys + o.misses ? (o.keys / (o.keys + o.misses)) * 100 : 0, n: o.n }))
+    .sort((x, y) => y.kpm - x.kpm);
+  const top = Math.max(1, ...rws.map((r) => r.kpm));
+  return rankCard("モード別の比較", "選んだ期間の平均 KPM。右は正確率と行数", rws.map((r) => ({
+    label: MODE_LABEL[r.mo] || r.mo, value: `${r.kpm} KPM`, fraction: r.kpm / top, detail: `${r.acc.toFixed(1)}%  ·  ${r.n} 行`,
+  })));
+}
+
 // ---------- 操作 ----------
 document.addEventListener("click", (e) => {
   const r = e.target.closest("[data-r]")?.dataset.r;
   if (r) { range = r; render(); }
   const h = e.target.closest("[data-h]")?.dataset.h;
   if (h) { heat = h; render(); }
+  const w = e.target.closest("[data-w]")?.dataset.w;
+  if (w) { when = w; render(); }
 });
 
 $("csv").onclick = async () => {

@@ -1,6 +1,8 @@
 // キー配列（JIS / US）、指の割り当て、物理キー → 文字の変換
 
 export const FINGER_NAMES = ["左 小指", "左 薬指", "左 中指", "左 人差し指", "右 人差し指", "右 中指", "右 薬指", "右 小指", "親指"];
+/** 段の名前（rows() の行番号順） */
+export const ROW_NAMES = ["数字段", "上段", "ホーム段", "下段"];
 export const FINGER_COLORS = ["#f27390", "#faa659", "#f2d959", "#73d980", "#66ccd9", "#7399fa", "#b38cfa", "#eb80e6", "#bfbfbf"];
 
 const FINGER_BY_COL = [
@@ -64,7 +66,7 @@ export function rows(setting) {
       const col = r === 0 && !isUS ? c + 1 : c;
       const fr = FINGER_BY_COL[r];
       const label = /^[a-z]$/.test(normal) ? normal.toUpperCase() : normal;
-      return { normal, shifted, code, finger: fr[Math.min(col, fr.length - 1)], label };
+      return { normal, shifted, code, finger: fr[Math.min(col, fr.length - 1)], label, row: r, col };
     })
   );
   return cache[name];
@@ -72,7 +74,7 @@ export function rows(setting) {
 
 /** 文字 → { key, shift } */
 export function lookup(setting, ch) {
-  if (ch === " ") return { key: { normal: " ", shifted: " ", code: "Space", finger: 8, label: "space" }, shift: false };
+  if (ch === " ") return { key: { normal: " ", shifted: " ", code: "Space", finger: 8, label: "space", row: 4, col: 0 }, shift: false };
   for (const row of rows(setting)) for (const k of row) {
     if (k.normal === ch) return { key: k, shift: false };
     if (k.shifted === ch) return { key: k, shift: true };
