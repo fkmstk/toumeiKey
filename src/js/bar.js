@@ -223,12 +223,22 @@ document.addEventListener("keydown", (e) => {
   if (c) { e.preventDefault(); model.type(c); }
 });
 
-window.addEventListener("focus", () => { focused = true; render(); });
-window.addEventListener("blur", () => { focused = false; render(); });
-document.addEventListener("mouseenter", () => { hovering = true; render(); });
-// 非アクティブなウィンドウでは mouseenter が来ないことがあるので mousemove でも拾う
-document.addEventListener("mousemove", () => { if (!hovering) { hovering = true; render(); } });
-document.addEventListener("mouseleave", () => { hovering = false; render(); });
+function setFocused(v) { if (focused !== v) { focused = v; render(); } }
+window.addEventListener("focus", () => setFocused(true));
+window.addEventListener("blur", () => setFocused(false));
+// WebView の blur は、他のアプリに切り替えたときに届かないことがある（macOS）。ネイティブのウィンドウイベントでも拾う
+win?.onFocusChanged(({ payload }) => setFocused(payload));
+// ホバー判定。非アクティブなウィンドウでは mouseenter / mouseleave が届かないことがあるので、
+// マウスが動くたびに延長し、しばらく動かなければホバー終了とみなす（帯が薄く戻らなくなるのを防ぐ）
+let hoverTimer;
+function touchHover() {
+  clearTimeout(hoverTimer);
+  hoverTimer = setTimeout(() => { hovering = false; render(); }, 1500);
+  if (!hovering) { hovering = true; render(); }
+}
+document.addEventListener("mouseenter", touchHover);
+document.addEventListener("mousemove", touchHover);
+document.addEventListener("mouseleave", () => { clearTimeout(hoverTimer); hovering = false; render(); });
 
 // 背景をドラッグして移動
 $("card").addEventListener("mousedown", (e) => {
