@@ -61,7 +61,11 @@ You can also practice your own text: paste from the clipboard or open a text fil
 > [!NOTE]
 > The builds are not code-signed, so you'll see a warning on first launch.
 > - **Windows**: "Windows protected your PC" → "More info" → "Run anyway"
-> - **macOS**: right-click the app → "Open" (or `xattr -dr com.apple.quarantine /Applications/TypingOverlay.app`)
+> - **macOS**: drag the app from the dmg into Applications, then run this in Terminal before opening it:
+>   ```bash
+>   xattr -dr com.apple.quarantine /Applications/TypingOverlay.app
+>   ```
+>   This also fixes the "is damaged and can't be opened" message on v2.1.3 and earlier (the file isn't actually damaged).
 
 The interface is in Japanese; the English mode and shortcuts work the same for everyone.
 

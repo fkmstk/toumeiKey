@@ -110,7 +110,11 @@ toumeiKey は画面の下に半透明の帯を出すだけ。動画はそのま�
 > [!NOTE]
 > コード署名をしていないため、初回起動時に警告が出ます。
 > - **Windows**: 「Windows によって PC が保護されました」→「詳細情報」→「実行」
-> - **macOS**: アプリを右クリック →「開く」（または `xattr -dr com.apple.quarantine /Applications/TypingOverlay.app`）
+> - **macOS**: dmg からアプリを「アプリケーション」へドラッグしたあと、ターミナルで次を実行してから開いてください。
+>   ```bash
+>   xattr -dr com.apple.quarantine /Applications/TypingOverlay.app
+>   ```
+>   v2.1.3 以前で「壊れているため開けません」と出た場合もこれで開けます（実際には壊れていません）。
 
 ## 使い方
 
