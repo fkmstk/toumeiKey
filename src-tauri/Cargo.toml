@@ -1,6 +1,6 @@
 [package]
 name = "typing-overlay"
-version = "2.1.1"
+version = "2.1.2"
 license = "MIT"
 description = "動画を見ながらタッチタイピングを練習できる半透明オーバーレイ"
 edition = "2021"
