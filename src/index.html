@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <title>TypingOverlay</title>
+  <link rel="stylesheet" href="css/tokens.css">
   <link rel="stylesheet" href="css/bar.css">
   <script type="module" src="js/bar.js"></script>
 </head>
@@ -22,9 +23,10 @@
     </div>
     <div class="controls" id="controls">
       <div class="seg" id="modes"></div>
-      <button id="btn-analytics" title="統計・分析 (⌘S / Ctrl+S)">📊</button>
-      <button id="btn-settings" title="設定 (⌘, / Ctrl+,)">⚙︎</button>
-      <button id="btn-hide" title="終了 (⌘Q / Ctrl+Q)">✕</button>
+      <span class="sep"></span>
+      <button id="btn-analytics" class="icon" title="統計・分析 (⌘S / Ctrl+S)"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></button>
+      <button id="btn-settings" class="icon" title="設定 (⌘, / Ctrl+,)"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+      <button id="btn-hide" class="icon" title="終了 (⌘Q / Ctrl+Q)"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     </div>
     <div class="toast" id="toast"></div>
   </div>

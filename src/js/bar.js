@@ -112,7 +112,7 @@ function render() {
   const hint = $("hint");
   if (!s.seenTips) {
     const mod = isMac ? "⌘" : "Ctrl+";
-    hint.innerHTML = `💡 <span>Ctrl+Alt+T でブラウザ ⇄ タイピング切替　右クリックでメニュー　${mod}, で設定</span><button id="tips-ok">OK</button>`;
+    hint.innerHTML = `<span>Ctrl+Alt+T でブラウザ ⇄ タイピング切替　右クリックでメニュー　${mod}, で設定</span><button id="tips-ok">OK</button>`;
     $("tips-ok").onclick = () => store.set("seenTips", true);
   } else if (!focused) {
     hint.innerHTML = `<span>⏸ 一時停止中 — クリック or Ctrl+Alt+T で再開</span>`;

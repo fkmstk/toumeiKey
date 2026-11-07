@@ -1,20 +1,12 @@
-/* 設定・分析ウィンドウ共通（ダーク固定） */
+/* 設定・分析ウィンドウ共通（tokens.css の上に重ねる） */
 :root {
-  color-scheme: dark;
-  --page: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink2: #c3c2b7; --muted: #898781;
-  --grid: #2c2c2a; --baseline: #383835; --border: rgba(255, 255, 255, 0.10);
-  --kpm: #3987e5; --time: #9085e9; --acc: #199e70; --good: #0ca30c; --critical: #d03b3b;
+  --page: #0e0e11; --surface: #17171b;
+  /* グラフ用（analytics-view.js の配色と揃える） */
+  --grid: #2a2a2f; --baseline: #38383e;
+  --kpm: #3987e5;
 }
-html, body { margin: 0; background: var(--page); color: var(--ink); font: 13px system-ui, -apple-system, "Segoe UI", "Yu Gothic UI", "Meiryo UI", sans-serif; }
-h1 { font-size: 20px; margin: 0; }
+html, body { margin: 0; background: var(--page); color: var(--ink); font: 13px var(--font-ui); }
+h1 { font-size: 18px; font-weight: 700; margin: 0; }
 h2 { font-size: 14px; margin: 0; font-weight: 600; }
 .sub { font-size: 11px; color: var(--ink2); margin-top: 2px; }
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; box-sizing: border-box; min-width: 0; }
-button, select { font: inherit; color: var(--ink); background: #2a2a28; border: 1px solid var(--border); border-radius: 7px; padding: 5px 11px; }
-button:hover { background: #343431; }
-button.danger { color: #ff8a8a; }
-.seg { display: inline-flex; background: #262624; border: 1px solid var(--border); border-radius: 8px; padding: 2px; }
-.seg button { border: 0; background: none; padding: 3px 11px; border-radius: 6px; }
-.seg button.on { background: #4a4a46; }
-input[type=range] { accent-color: var(--kpm); }
-input[type=checkbox] { accent-color: var(--kpm); width: 15px; height: 15px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 16px; box-sizing: border-box; min-width: 0; }

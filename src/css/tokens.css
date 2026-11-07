@@ -1,0 +1,62 @@
+/* 全画面共通のデザイントークンと部品。帯・設定・統計はすべてこれを読み込む。 */
+:root {
+  color-scheme: dark;
+
+  /* 文字 */
+  --font-ui: system-ui, -apple-system, "Segoe UI", "Hiragino Sans", "Yu Gothic UI", "Meiryo UI", sans-serif;
+  --font-jp: "Hiragino Sans", "Yu Gothic UI", "Meiryo", sans-serif;
+  --font-mono: "JetBrains Mono", "Cascadia Mono", "SF Mono", Menlo, Consolas, monospace;
+
+  /* 色（ダーク固定） */
+  --ink: #f2f2f0;
+  --ink2: rgba(242, 242, 240, 0.66);
+  --muted: rgba(242, 242, 240, 0.45);
+  --accent: #73d9ff;          /* 現在位置・選択中・スライダー */
+  --accent-soft: rgba(115, 217, 255, 0.16);
+  --good: #73e094;            /* 打てた・上昇 */
+  --bad: #ff6173;             /* ミス・下降・消去 */
+  --line: rgba(255, 255, 255, 0.10);
+  --line-strong: rgba(255, 255, 255, 0.22);
+  --fill: rgba(255, 255, 255, 0.07);       /* ボタン・セグメントの地 */
+  --fill-hover: rgba(255, 255, 255, 0.13);
+  --fill-on: rgba(255, 255, 255, 0.20);
+  --glass: rgba(18, 18, 22, 0.92);         /* トースト・ツールチップ */
+
+  /* 形 */
+  --r-sm: 7px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --r-pill: 999px;
+}
+
+/* ボタン */
+.btn, button {
+  font: inherit; color: var(--ink); background: var(--fill); border: 1px solid var(--line);
+  border-radius: var(--r-sm); padding: 5px 12px; cursor: default;
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+button:hover { background: var(--fill-hover); }
+button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+button.danger { color: var(--bad); }
+button.icon { background: none; border-color: transparent; padding: 4px; border-radius: var(--r-sm); color: var(--ink2); }
+button.icon:hover { background: var(--fill-hover); color: var(--ink); }
+.ico { width: 16px; height: 16px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+/* セグメント切り替え */
+.seg { display: inline-flex; gap: 2px; background: var(--fill); border: 1px solid var(--line); border-radius: var(--r-md); padding: 2px; }
+.seg button { white-space: nowrap; border: 0; background: none; padding: 3px 11px; border-radius: calc(var(--r-md) - 3px); color: var(--ink2); }
+.seg button:hover { background: var(--fill-hover); color: var(--ink); }
+.seg button.on { background: var(--fill-on); color: var(--ink); }
+
+/* フォーム */
+select { font: inherit; color: var(--ink); background: var(--fill); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 5px 10px; }
+select option { background: #1c1c20; }
+input[type=range] { accent-color: var(--accent); }
+input[type=checkbox] { accent-color: var(--accent); width: 15px; height: 15px; }
+
+/* トースト・ツールチップ */
+.toast, .tip {
+  background: var(--glass); color: var(--ink); border: 1px solid var(--line-strong);
+  border-radius: var(--r-md); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+}

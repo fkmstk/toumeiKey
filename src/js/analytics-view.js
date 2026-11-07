@@ -1,5 +1,5 @@
 // 統計・分析ウィンドウ。グラフは SVG で描画（外部ライブラリなし）。
-// 配色はダーク面 #1a1a19 用の参照パレット。単一系列のグラフは指標ごとに1色、ヒートマップは青の単色ランプ。
+// 配色はダーク面 #17171b 用の参照パレット。単一系列のグラフは指標ごとに1色、ヒートマップは青の単色ランプ。
 import * as store from "./store.js";
 import { Analytics, stat, day, formatDuration } from "./analytics.js";
 import { rows, lookup, FINGER_NAMES, FINGER_COLORS } from "./keyboard.js";
@@ -9,7 +9,7 @@ const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const a = new Analytics();
 
-const C = { kpm: "#3987e5", time: "#9085e9", acc: "#199e70", grid: "#2c2c2a", baseline: "#383835", muted: "#898781" };
+const C = { kpm: "#3987e5", time: "#9085e9", acc: "#199e70", grid: "#2a2a2f", baseline: "#38383e", muted: "#8b8b90" };
 const RAMP = ["#184f95", "#1c5cab", "#256abf", "#2a78d6", "#3987e5", "#5598e7", "#6da7ec", "#86b6ef", "#9ec5f4", "#b7d3f6", "#cde2fb"];
 const rampColor = (t) => RAMP[Math.round(Math.max(0, Math.min(1, t)) * (RAMP.length - 1))];
 const rampInk = (t) => (t > 0.55 ? "#0b0b0b" : "#ffffff");
@@ -78,10 +78,10 @@ function chart(el, { n, ys, ys2, color, height, yLo, yHi, xLabel, tooltip, mode,
     let d = "", pen = false;
     line.forEach((v, i) => { if (v == null) return; d += `${pen ? "L" : "M"}${X(i).toFixed(1)},${Y(v).toFixed(1)} `; pen = true; });
     s += `<path d="${d}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
-    if (mode === "line") ys.forEach((v, i) => { if (v != null) s += `<circle cx="${X(i)}" cy="${Y(v)}" r="4" fill="${color}" stroke="#1a1a19" stroke-width="2"/>`; });
+    if (mode === "line") ys.forEach((v, i) => { if (v != null) s += `<circle cx="${X(i)}" cy="${Y(v)}" r="4" fill="${color}" stroke="#17171b" stroke-width="2"/>`; });
   }
   s += `<line id="rule" x1="0" x2="0" y1="${m.t}" y2="${m.t + ih}" stroke="${C.baseline}" visibility="hidden"/>`;
-  s += `<circle id="hl" r="5" fill="${color}" stroke="#1a1a19" stroke-width="2" visibility="hidden"/>`;
+  s += `<circle id="hl" r="5" fill="${color}" stroke="#17171b" stroke-width="2" visibility="hidden"/>`;
   s += `<rect x="${m.l}" y="${m.t}" width="${iw}" height="${ih}" fill="transparent" id="hit"/></svg>`;
   el.innerHTML = s;
 

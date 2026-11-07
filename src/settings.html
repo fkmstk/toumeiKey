@@ -3,11 +3,12 @@
 <head>
   <meta charset="utf-8">
   <title>設定</title>
+  <link rel="stylesheet" href="css/tokens.css">
   <link rel="stylesheet" href="css/window.css">
   <style>
     body { padding: 18px; }
     section { margin-bottom: 14px; }
-    section > h2 { margin: 0 0 8px 2px; color: var(--ink2); font-size: 12px; }
+    section > h2 { margin: 0 0 8px 2px; color: var(--ink2); font-size: 12px; font-weight: 600; }
     .card { display: flex; flex-direction: column; gap: 12px; }
     .line { display: flex; align-items: center; gap: 10px; min-height: 26px; }
     .line > label:first-child { width: 120px; flex: none; color: var(--ink); }
@@ -15,8 +16,8 @@
     .val { width: 34px; text-align: right; color: var(--ink2); font-variant-numeric: tabular-nums; }
     .note { font-size: 11px; color: var(--muted); line-height: 1.5; }
     .kv { display: flex; justify-content: space-between; color: var(--ink2); }
-    .kv b { color: var(--ink); font-weight: 600; }
-    pre { margin: 0; font: 11px/1.7 ui-monospace, Menlo, Consolas, monospace; color: var(--ink2); white-space: pre-wrap; }
+    .kv b { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
+    pre { margin: 0; font: 11px/1.7 var(--font-mono); color: var(--ink2); white-space: pre-wrap; }
     .btns { display: flex; gap: 8px; flex-wrap: wrap; }
     #n-sel { flex: 1; min-width: 0; }
   </style>

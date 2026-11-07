@@ -4,22 +4,22 @@
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
 .tiles { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
 .tile .t { font-size: 11px; color: var(--ink2); }
-.tile .v { font-size: 24px; font-weight: 600; margin: 4px 0; white-space: nowrap; }
+.tile .v { font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; margin: 4px 0; white-space: nowrap; }
 .tile .n { font-size: 10px; color: var(--muted); white-space: nowrap; overflow: hidden; }
 .tile .n .d { color: var(--ink2); font-variant-numeric: tabular-nums; }
-.up { color: var(--good); } .down { color: var(--critical); }
+.up { color: var(--good); } .down { color: var(--bad); }
 .head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
-.hero { text-align: right; } .hero b { font-size: 22px; font-weight: 600; display: block; } .hero span { font-size: 10px; color: var(--ink2); }
+.hero { text-align: right; } .hero b { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; display: block; } .hero span { font-size: 10px; color: var(--ink2); }
 .chart { position: relative; }
 .chart svg { display: block; overflow: visible; }
 .chart text { fill: var(--muted); font-size: 10px; font-variant-numeric: tabular-nums; }
 .empty { color: var(--muted); font-size: 12px; padding: 24px 0; text-align: center; }
-.tip { position: fixed; pointer-events: none; display: none; background: #262624; border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; max-width: 260px; z-index: 10; }
+.tip { position: fixed; pointer-events: none; display: none; padding: 6px 10px; max-width: 260px; z-index: 10; }
 .tip div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; }
 .tip div:first-child { font-size: 10px; color: var(--ink2); }
 .tip div:nth-child(2) { font-weight: 600; }
 .rank { display: grid; grid-template-columns: minmax(90px, auto) 1fr auto auto; gap: 7px 10px; align-items: center; }
-.rank .l { font: 500 12px ui-monospace, Menlo, Consolas, monospace; display: flex; align-items: center; gap: 6px; }
+.rank .l { font: 500 12px var(--font-mono); display: flex; align-items: center; gap: 6px; }
 .rank .sw { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
 .rank .b { height: 6px; background: var(--grid); border-radius: 3px; overflow: hidden; }
 .rank .b > div { height: 100%; background: var(--kpm); border-radius: 3px; min-width: 4px; }
@@ -28,8 +28,8 @@
 .heat { display: flex; align-items: flex-end; gap: 24px; flex-wrap: wrap; }
 .heat .rows { display: flex; flex-direction: column; gap: 3px; }
 .heat .r { display: flex; gap: 3px; }
-.heat .k { width: 40px; height: 40px; border-radius: 5px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-.heat .k b { font: 600 13px ui-monospace, Menlo, Consolas, monospace; }
+.heat .k { width: 40px; height: 40px; border-radius: var(--r-sm); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.heat .k b { font: 600 13px var(--font-mono); }
 .heat .k i { font-style: normal; font-size: 9px; opacity: 0.85; font-variant-numeric: tabular-nums; }
 .legend { font-size: 11px; color: var(--ink2); display: flex; flex-direction: column; gap: 4px; }
 .legend .g { width: 160px; height: 10px; border-radius: 3px; }
