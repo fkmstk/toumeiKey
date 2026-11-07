@@ -2,6 +2,7 @@
 import * as store from "./store.js";
 import { LABELS } from "./store.js";
 import { Analytics, formatDuration } from "./analytics.js";
+import { NOVELS } from "./novels.js";
 
 const T = window.__TAURI__;
 const isMac = navigator.platform.toUpperCase().includes("MAC");
@@ -40,6 +41,17 @@ function toggle(key, label) {
 
 const pct = (v) => `${Math.round(v * 100)}`;
 
+function novelLine() {
+  const cur = NOVELS.find((n) => n.id === store.get("novelId")) || NOVELS[0];
+  const pos = (store.get("novelPos") || {})[cur.id] || 0;
+  const opts = NOVELS.map((n) => {
+    const p = (store.get("novelPos") || {})[n.id] || 0;
+    return `<option value="${n.id}" ${n.id === cur.id ? "selected" : ""}>${n.title}（${n.author}）${n.scope} — ${p ? `${p + 1}/` : ""}${n.lines.length} 行</option>`;
+  }).join("");
+  return `<div class="line"><label>小説</label><select id="n-sel">${opts}</select><button id="n-restart">最初から</button></div>` +
+    `<div class="note">小説モードでは1文ずつ順番に進み、続きは自動で保存されます（いま ${pos + 1} 行目）。本文は青空文庫より。読みがなは自動で付けたもので、まれに誤りがあります。</div>`;
+}
+
 function render() {
   $("look").innerHTML =
     `<div class="line"><label>フォント</label>${seg("fontTheme", LABELS.fontTheme)}</div>` +
@@ -52,10 +64,17 @@ function render() {
 
   $("practice").innerHTML =
     `<div class="line"><label>出題</label>${seg("contentKind", LABELS.contentKind)}</div>` +
+    novelLine() +
     toggle("showKeyboard", "キーボードガイドを表示") +
     `<div class="line"><label>キー配列</label>${seg("keyLayout", LABELS.keyLayout)}</div>` +
     `<div class="btns"><button id="b-file">ファイルから読み込む…</button><button id="b-paste">クリップボードから</button></div>` +
     `<div class="note">カスタム文は1行1問。漢字を含む文は「今日は晴れ|きょうははれ」のように | の後に読みを書く。<br>日本語入力（IME）がオンのままでも、物理キーから文字を判定するので練習できます。</div>`;
+  $("n-sel").onchange = (e) => { store.set("novelId", e.target.value); if (store.get("mode") !== "novel") store.set("mode", "novel"); };
+  $("n-restart").onclick = () => {
+    const id = store.get("novelId");
+    store.set("novelPos", { ...(store.get("novelPos") || {}), [id]: 0 });
+    if (store.get("mode") !== "novel") store.set("mode", "novel");
+  };
   $("b-file").onclick = () => store.send("openFile");
   $("b-paste").onclick = () => store.send("pasteCustom");
 
@@ -84,7 +103,7 @@ function render() {
   const m = isMac ? "⌘" : "Ctrl+";
   $("keys").textContent =
     `Ctrl+Alt+T   タイピング ⇄ ブラウザのフォーカス切替\nEsc  行の最初から / Tab  スキップ\n` +
-    `${m}1 ${m}2 ${m}3   日本語 / English / カスタム\n${m},  設定 / ${m}S  統計・分析 / ${m}K  コンパクト表示\n` +
+    `${m}1 ${m}2 ${m}3 ${m}4   日本語 / English / 小説 / カスタム\n${m},  設定 / ${m}S  統計・分析 / ${m}K  コンパクト表示\n` +
     `${m}V  クリップボード / ${m}O  ファイル\n${m}W  隠す / ${m}Q  終了\n右クリックでメニュー`;
 }
 

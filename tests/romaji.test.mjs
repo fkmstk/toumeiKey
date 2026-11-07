@@ -1,6 +1,7 @@
 // node tests/romaji.test.mjs で実行
 import { units, parseSentence } from "../src/js/romaji.js";
 import { VOCAB } from "../src/js/vocab.js";
+import { NOVELS } from "../src/js/novels.js";
 
 function run(reading, input) {
   const us = units(reading); let idx = 0, buf = "";
@@ -32,8 +33,16 @@ for (const [, r] of all) {
   if (units(r).map((u) => u.display).join("") !== r) { fail++; console.log("DROP", r); }
   if (!run(r, guide(r))) { fail++; console.log("UNTYPEABLE", r); }
 }
+// 小説：すべての行が読みどおりに打てること（漢字が読みに残っていないこと）
+let novelLines = 0;
+for (const n of NOVELS) for (const [d, r] of n.lines) {
+  novelLines++;
+  const kana = (x) => [...x].filter((c) => /[\u3041-\u30ffー]/.test(c)).join("");
+  if (/[\u3400-\u9fff]/.test(r) || kana(units(r).map((u) => u.display).join("")) !== kana(r)) { fail++; console.log("NOVEL DROP", n.id, d); }
+  if (!run(r, guide(r))) { fail++; console.log("NOVEL UNTYPEABLE", n.id, d); }
+}
 const p = parseSentence("今日は晴れ|きょうははれ");
 if (!p || p.display !== "今日は晴れ" || p.reading !== "きょうははれ") { fail++; console.log("FAIL parse"); }
 if (parseSentence("   ") !== null) { fail++; console.log("FAIL parse empty"); }
-console.log(`cases ${cases.length} + vocab ${all.length}: ${fail === 0 ? "all OK" : fail + " failed"}`);
+console.log(`cases ${cases.length} + vocab ${all.length} + novel ${novelLines}: ${fail === 0 ? "all OK" : fail + " failed"}`);
 process.exit(fail ? 1 : 0);

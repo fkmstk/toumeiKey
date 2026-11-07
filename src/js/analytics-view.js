@@ -13,7 +13,7 @@ const C = { kpm: "#3987e5", time: "#9085e9", acc: "#199e70", grid: "#2c2c2a", ba
 const RAMP = ["#184f95", "#1c5cab", "#256abf", "#2a78d6", "#3987e5", "#5598e7", "#6da7ec", "#86b6ef", "#9ec5f4", "#b7d3f6", "#cde2fb"];
 const rampColor = (t) => RAMP[Math.round(Math.max(0, Math.min(1, t)) * (RAMP.length - 1))];
 const rampInk = (t) => (t > 0.55 ? "#0b0b0b" : "#ffffff");
-const MODE_LABEL = { japanese: "日本語", english: "English", custom: "カスタム" };
+const MODE_LABEL = { japanese: "日本語", english: "English", novel: "小説", custom: "カスタム" };
 
 let range = "week";   // week | month | all
 let heat = "miss";    // miss | speed

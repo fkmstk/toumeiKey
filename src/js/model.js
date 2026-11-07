@@ -2,10 +2,12 @@
 import { units as toUnits, parseSentence } from "./romaji.js";
 import { VOCAB } from "./vocab.js";
 import * as store from "./store.js";
+import { NOVELS } from "./novels.js";
 
 const IDLE_CAP = 2.0;
 const JP = VOCAB.japanese.map(([display, reading]) => ({ display, reading }));
 const EN = VOCAB.english.map((s) => ({ display: s, reading: s }));
+const NOVEL_LINES = Object.fromEntries(NOVELS.map((n) => [n.id, n.lines.map(([display, reading]) => ({ display, reading }))]));
 
 function shuffle(a) {
   const b = [...a];
@@ -154,7 +156,7 @@ export class TypingModel {
     }
     this.doneFlash = true;
     this.onEvent("lineDone", last);
-    setTimeout(() => { this.doneFlash = false; this.nextSentence(); this.onChange(); }, 200);
+    setTimeout(() => { this.doneFlash = false; this.advanceNovel(); this.nextSentence(); this.onChange(); }, 200);
   }
 
   restartLine() {
@@ -166,7 +168,7 @@ export class TypingModel {
     this.lineMisses = 0;
   }
 
-  skip() { this.nextSentence(); this.onChange(); }
+  skip() { this.advanceNovel(); this.nextSentence(); this.onChange(); }
 
   resetSession(notify = true) {
     this.correct = 0; this.misses = 0; this.lines = 0; this.activeTime = 0;
@@ -193,6 +195,31 @@ export class TypingModel {
     return true;
   }
 
+  // ---- 小説 ----
+  get novel() { return NOVELS.find((n) => n.id === store.get("novelId")) || NOVELS[0]; }
+  get novelLines() { return NOVEL_LINES[this.novel.id]; }
+  /** 今の行（0始まり）。範囲外なら最初に戻す */
+  get novelPos() {
+    const p = (store.get("novelPos") || {})[this.novel.id] || 0;
+    return p < this.novelLines.length ? p : 0;
+  }
+  setNovelPos(p) { store.set("novelPos", { ...(store.get("novelPos") || {}), [this.novel.id]: p }); }
+
+  /** 小説モードなら1行進める。最後まで読んだら最初に戻る */
+  advanceNovel() {
+    if (this.mode !== "novel") return;
+    const next = this.novelPos + 1;
+    if (next >= this.novelLines.length) { this.setNovelPos(0); this.onEvent("novelDone"); }
+    else this.setNovelPos(next);
+  }
+
+  /** 作品の変更・位置の変更（設定ウィンドウから）を反映 */
+  novelChanged() {
+    if (this.mode !== "novel") return;
+    this.nextSentence();
+    this.onChange();
+  }
+
   // ---- 出題 ----
   get kind() { return store.get("contentKind") || "mix"; }
   get poolKey() { return `${this.mode}-${this.kind}-${this.custom.length}`; }
@@ -215,6 +242,15 @@ export class TypingModel {
   }
 
   nextSentence() {
+    if (this.mode === "novel") {
+      const L = this.novelLines, p = this.novelPos;
+      this.sentence = L[p];
+      this.upcoming = L[(p + 1) % L.length];
+      this.upcomingKey = "";
+      this.units = toUnits(this.sentence.reading);
+      this.restartLine();
+      return;
+    }
     if (this.upcomingKey !== this.poolKey || !this.upcoming) this.upcoming = this.randomSentence(null);
     this.sentence = this.upcoming;
     this.upcoming = this.randomSentence(this.sentence);

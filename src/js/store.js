@@ -13,7 +13,7 @@ export function listen(name, f) {
 }
 
 export const DEFAULTS = {
-  mode: "japanese",          // japanese | english | custom
+  mode: "japanese",          // japanese | english | novel | custom
   contentKind: "mix",        // sentences | words | mix
   bgOpacity: 0.4,
   textOpacity: 0.95,
@@ -30,6 +30,8 @@ export const DEFAULTS = {
   missSound: true,
   doneSound: true,
   customLines: [],
+  novelId: "neko",           // 小説モードで読む作品
+  novelPos: {},              // 作品ごとの読み進めた位置 { neko: 12, ... }
   bestKPM: 0,
 };
 
@@ -81,7 +83,7 @@ export function onCommand(f) { busListeners.add(f); }
 listen("bus", ({ cmd, payload }) => { for (const f of busListeners) f(cmd, payload); });
 
 export const LABELS = {
-  mode: { japanese: "日本語", english: "English", custom: "カスタム" },
+  mode: { japanese: "日本語", english: "English", novel: "小説", custom: "カスタム" },
   contentKind: { sentences: "文章", words: "単語", mix: "ミックス" },
   fontTheme: { modern: "モダン", round: "まるっと", textbook: "教科書", system: "システム" },
   cursorStyle: { underline: "下線", color: "文字色", box: "うすい枠" },
