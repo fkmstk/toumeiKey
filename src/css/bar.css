@@ -81,6 +81,9 @@ body { display: flex; flex-direction: column; justify-content: flex-end; height:
 .card.hover .controls, .card.focused .controls, .controls:hover { opacity: 1; }
 .controls .seg { border: 0; background: none; padding: 0; }
 .controls .seg button { font-size: 11px; padding: 3px 9px; }
+.controls button.icon.on { color: var(--accent); }
+/* キーボードを畳んだときは統計が操作ボタンの下に潜らないようにする */
+.card.nokbd .stats { margin-right: 300px; }
 .controls .sep { width: 1px; height: 16px; background: var(--line); margin: 0 2px; }
 
 .toast {

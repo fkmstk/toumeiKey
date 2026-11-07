@@ -84,6 +84,8 @@ function render() {
   card.classList.toggle("done", model.doneFlash && !model.missFlash);
   card.classList.toggle("dimmed", s.dimWhenIdle && !focused && !hovering);
   card.classList.toggle("compact", s.compact);
+  card.classList.toggle("nokbd", !s.showKeyboard);
+  $("btn-kbd").classList.toggle("on", s.showKeyboard);
 
   if (s.compact) $("stats").style.display = "none";
   else {
@@ -201,6 +203,7 @@ async function openFile() {
 }
 
 const openWindow = (kind) => invoke("open_window", { kind });
+const toggleKeyboard = () => store.set("showKeyboard", !store.get("showKeyboard"));
 const hide = () => invoke("hide_main");
 const quit = () => { analytics.saveNow(); invoke("quit"); };
 
@@ -211,6 +214,7 @@ document.addEventListener("keydown", (e) => {
     const actions = {
       "1": () => setMode("japanese"), "2": () => setMode("english"), "3": () => setMode("novel"), "4": () => setMode("custom"),
       ",": () => openWindow("settings"), s: () => openWindow("analytics"), k: () => store.set("compact", !store.get("compact")),
+      g: toggleKeyboard,
       v: pasteCustom, o: openFile, w: hide, q: quit,
     };
     if (actions[k]) { e.preventDefault(); actions[k](); }
@@ -247,6 +251,7 @@ $("card").addEventListener("mousedown", (e) => {
 });
 
 $("modes").addEventListener("click", (e) => { const m = e.target.closest("button")?.dataset.mode; if (m) setMode(m); });
+$("btn-kbd").onclick = toggleKeyboard;
 $("btn-analytics").onclick = () => openWindow("analytics");
 $("btn-settings").onclick = () => openWindow("settings");
 $("btn-hide").onclick = quit;
@@ -278,7 +283,7 @@ document.addEventListener("contextmenu", async (e) => {
       await item("統計・分析…", () => openWindow("analytics"), `${mod}+S`),
       await item("設定…", () => openWindow("settings"), `${mod}+,`),
       await check("コンパクト表示", s.compact, () => store.set("compact", !s.compact), `${mod}+K`),
-      await check("キーボードガイド", s.showKeyboard, () => store.set("showKeyboard", !s.showKeyboard)),
+      await check("キーボードガイド", s.showKeyboard, toggleKeyboard, `${mod}+G`),
       await Submenu.new({ text: "タイプ音", items: sounds }),
       await PredefinedMenuItem.new({ item: "Separator" }),
       await item("テキストファイルで練習…", openFile, `${mod}+O`),

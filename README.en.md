@@ -81,6 +81,7 @@ Drag the background to move it, drag the edges to resize, right-click for the me
 | Ctrl(⌘)+, | Settings |
 | Ctrl(⌘)+S | Analytics |
 | Ctrl(⌘)+K | Compact view |
+| Ctrl(⌘)+G | Show / hide keyboard guide |
 | Ctrl(⌘)+V / O | Practice clipboard text / a text file |
 | Ctrl(⌘)+W / Q | Hide / quit |
 

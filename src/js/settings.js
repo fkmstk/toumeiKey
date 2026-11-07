@@ -103,7 +103,7 @@ function render() {
   const m = isMac ? "⌘" : "Ctrl+";
   $("keys").textContent =
     `Ctrl+Alt+T   タイピング ⇄ ブラウザのフォーカス切替\nEsc  行の最初から / Tab  スキップ\n` +
-    `${m}1 ${m}2 ${m}3 ${m}4   日本語 / English / 小説 / カスタム\n${m},  設定 / ${m}S  統計・分析 / ${m}K  コンパクト表示\n` +
+    `${m}1 ${m}2 ${m}3 ${m}4   日本語 / English / 小説 / カスタム\n${m},  設定 / ${m}S  統計・分析 / ${m}K  コンパクト表示 / ${m}G  キーボードガイド\n` +
     `${m}V  クリップボード / ${m}O  ファイル\n${m}W  隠す / ${m}Q  終了\n右クリックでメニュー`;
 }
 
