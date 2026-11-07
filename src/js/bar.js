@@ -221,7 +221,7 @@ $("card").addEventListener("mousedown", (e) => {
 $("modes").addEventListener("click", (e) => { const m = e.target.closest("button")?.dataset.mode; if (m) setMode(m); });
 $("btn-analytics").onclick = () => openWindow("analytics");
 $("btn-settings").onclick = () => openWindow("settings");
-$("btn-hide").onclick = hide;
+$("btn-hide").onclick = quit;
 
 // 右クリックメニュー
 document.addEventListener("contextmenu", async (e) => {

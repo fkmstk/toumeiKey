@@ -335,9 +335,9 @@ pub fn run() {
             match e {
                 WindowEvent::Moved(_) | WindowEvent::Resized(_) => save_placement(w.app_handle(), w),
                 WindowEvent::CloseRequested { api, .. } => {
-                    // 帯は閉じずに隠すだけ（終了はトレイから）
+                    // 閉じる操作（Alt+F4 など）は記録を保存してから終了
                     api.prevent_close();
-                    let _ = w.hide();
+                    quit_app(w.app_handle());
                 }
                 _ => {}
             }
