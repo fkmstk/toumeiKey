@@ -22,6 +22,7 @@ export const DEFAULTS = {
   fontTheme: "modern",       // modern | round | textbook | system
   cursorStyle: "underline",  // underline | color | box
   showKeyboard: true,
+  showKana: false,           // 漢字の文の下に読みがな（ひらがな）を出す。ローマ字があるので標準では出さない
   keyLayout: "auto",         // auto | jis | us
   dimWhenIdle: true,
   compact: false,

@@ -66,6 +66,7 @@ function render() {
   $("practice").innerHTML =
     `<div class="line"><label>出題</label>${seg("contentKind", LABELS.contentKind)}</div>` +
     novelLine() +
+    toggle("showKana", "漢字の文の下に読みがなを表示") +
     toggle("showKeyboard", "キーボードガイドを表示") +
     `<div class="line"><label>キー配列</label>${seg("keyLayout", LABELS.keyLayout)}</div>` +
     `<div class="btns"><button id="b-file">ファイルから読み込む…</button><button id="b-paste">クリップボードから</button></div>` +

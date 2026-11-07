@@ -49,9 +49,9 @@ toumeiKey は画面の下に半透明の帯を出すだけ。動画はそのま�
 
 ### 4つのモード
 
-<img src="docs/images/mode-japanese.png" width="760" alt="日本語モード：漢字かな交じり文と読みがな、ローマ字ガイド">
+<img src="docs/images/mode-japanese.png" width="760" alt="日本語モード：漢字かな交じり文とローマ字ガイド">
 
-**日本語** — 日常の文章150・単語183。漢字かな交じりの文・読みがな・ローマ字を同時に表示。
+**日本語** — 日常の文章150・単語183。漢字かな交じりの文とローマ字を表示（読みがなも設定で出せます）。
 
 <img src="docs/images/mode-english.png" width="760" alt="English モード">
 

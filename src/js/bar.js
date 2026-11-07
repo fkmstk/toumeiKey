@@ -101,9 +101,9 @@ function render() {
   }
 
   if (model.showsReading) {
-    $("display").style.display = ""; $("kana").style.display = "";
+    $("display").style.display = ""; $("kana").style.display = s.showKana ? "" : "none";
     $("display").textContent = model.sentence.display;
-    $("kana").innerHTML = parts(model.kanaParts);
+    if (s.showKana) $("kana").innerHTML = parts(model.kanaParts);
   } else {
     $("display").style.display = "none"; $("kana").style.display = "none";
   }
@@ -289,6 +289,7 @@ document.addEventListener("contextmenu", async (e) => {
       await item("設定…", () => openWindow("settings"), `${mod}+,`),
       await check("コンパクト表示", s.compact, () => store.set("compact", !s.compact), `${mod}+K`),
       await check("キーボードガイド", s.showKeyboard, toggleKeyboard, `${mod}+G`),
+      await check("読みがな", s.showKana, () => store.set("showKana", !s.showKana)),
       await Submenu.new({ text: "タイプ音", items: sounds }),
       await PredefinedMenuItem.new({ item: "Separator" }),
       await item("テキストファイルで練習…", openFile, `${mod}+O`),
