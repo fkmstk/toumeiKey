@@ -119,7 +119,7 @@ function render() {
     hint.innerHTML = `<span>Ctrl+Alt+T でブラウザ ⇄ タイピング切替　右クリックでメニュー　${mod}, で設定</span><button id="tips-ok">OK</button>`;
     $("tips-ok").onclick = () => store.set("seenTips", true);
   } else if (!focused) {
-    hint.innerHTML = `<span>⏸ 一時停止中 — クリック or Ctrl+Alt+T で再開</span>`;
+    hint.innerHTML = `<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6v12M15 6v12" stroke-width="3"/></svg><span>一時停止中 — クリックか Ctrl+Alt+T で再開</span>`;
   } else hint.innerHTML = "";
 
   $("modes").innerHTML = Object.entries(LABELS.mode)

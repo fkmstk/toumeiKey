@@ -1,10 +1,11 @@
 .wrap { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+#content { display: flex; flex-direction: column; gap: 14px; }
 .toolbar { display: flex; align-items: center; gap: 12px; }
 .spacer { flex: 1; }
-.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: stretch; }
 .tiles { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
 .tile .t { font-size: 11px; color: var(--ink2); }
-.tile .v { font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; margin: 4px 0; white-space: nowrap; }
+.tile .v { font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 32px; height: 32px; margin: 4px 0 2px; white-space: nowrap; }
 .tile .n { font-size: 10px; color: var(--muted); white-space: nowrap; overflow: hidden; }
 .tile .n .d { color: var(--ink2); font-variant-numeric: tabular-nums; }
 .up { color: var(--good); } .down { color: var(--bad); }
@@ -18,7 +19,7 @@
 .tip div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; }
 .tip div:first-child { font-size: 10px; color: var(--ink2); }
 .tip div:nth-child(2) { font-weight: 600; }
-.rank { display: grid; grid-template-columns: minmax(90px, auto) 1fr auto auto; gap: 7px 10px; align-items: center; }
+.rank { display: grid; grid-template-columns: minmax(56px, max-content) 1fr auto auto; gap: 8px 14px; align-items: center; }
 .rank .l { font: 500 12px var(--font-mono); display: flex; align-items: center; gap: 6px; }
 .rank .sw { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
 .rank .b { height: 6px; background: var(--grid); border-radius: 3px; overflow: hidden; }
@@ -37,7 +38,7 @@
 .legend .na { display: flex; gap: 4px; align-items: center; font-size: 10px; color: var(--muted); }
 .legend .na span { width: 10px; height: 10px; background: var(--grid); border-radius: 2px; display: inline-block; }
 table { width: 100%; border-collapse: collapse; font-size: 12px; }
-th { text-align: left; color: var(--ink2); font-weight: 500; font-size: 11px; padding: 6px 8px; border-bottom: 1px solid var(--baseline); }
+th { text-align: left; color: var(--ink2); font-weight: 500; font-size: 11px; padding: 6px 8px; border-bottom: 1px solid var(--baseline); position: sticky; top: 0; background: var(--surface); }
 td { padding: 5px 8px; border-bottom: 1px solid var(--grid); font-variant-numeric: tabular-nums; white-space: nowrap; }
 td.txt { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 380px; }
 .scroll { max-height: 300px; overflow: auto; }

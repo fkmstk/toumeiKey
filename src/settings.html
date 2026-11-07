@@ -12,12 +12,15 @@
     .card { display: flex; flex-direction: column; gap: 12px; }
     .line { display: flex; align-items: center; gap: 10px; min-height: 26px; }
     .line > label:first-child { width: 120px; flex: none; color: var(--ink); }
-    .line input[type=range] { flex: 1; }
-    .val { width: 34px; text-align: right; color: var(--ink2); font-variant-numeric: tabular-nums; }
+    .line input[type=range] { flex: 1; margin: 0; }
+    .line input[type=checkbox] { margin: 0 3px 0 1px; }
+    .val { width: 44px; text-align: right; color: var(--ink2); font-variant-numeric: tabular-nums; }
     .note { font-size: 11px; color: var(--muted); line-height: 1.5; }
     .kv { display: flex; justify-content: space-between; color: var(--ink2); }
     .kv b { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
-    pre { margin: 0; font: 11px/1.7 var(--font-mono); color: var(--ink2); white-space: pre-wrap; }
+    #keys { display: grid; grid-template-columns: max-content 1fr; gap: 8px 14px; align-items: center; color: var(--ink2); }
+    #keys .kk { display: flex; gap: 4px; color: var(--ink2); font-size: 12px; }
+    kbd { font: 600 11px var(--font-mono); color: var(--ink); background: var(--fill); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; padding: 1px 6px; }
     .btns { display: flex; gap: 8px; flex-wrap: wrap; }
     #n-sel { flex: 1; min-width: 0; }
   </style>
@@ -28,6 +31,6 @@
   <section><h2>練習</h2><div class="card" id="practice"></div></section>
   <section><h2>サウンド</h2><div class="card" id="sound"></div></section>
   <section><h2>記録</h2><div class="card" id="records"></div></section>
-  <section><h2>ショートカット</h2><div class="card"><pre id="keys"></pre></div></section>
+  <section><h2>ショートカット</h2><div class="card"><div id="keys"></div></div></section>
 </body>
 </html>

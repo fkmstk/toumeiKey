@@ -39,17 +39,18 @@ function toggle(key, label) {
   return `<label class="line"><input type="checkbox" id="${id}" ${store.get(key) ? "checked" : ""}> ${label}</label>`;
 }
 
-const pct = (v) => `${Math.round(v * 100)}`;
+const pct = (v) => `${Math.round(v * 100)}%`;
+const px = (v) => `${v}px`;
 
 function novelLine() {
   const cur = NOVELS.find((n) => n.id === store.get("novelId")) || NOVELS[0];
   const pos = (store.get("novelPos") || {})[cur.id] || 0;
   const opts = NOVELS.map((n) => {
     const p = (store.get("novelPos") || {})[n.id] || 0;
-    return `<option value="${n.id}" ${n.id === cur.id ? "selected" : ""}>${n.title}（${n.author}）${n.scope} — ${p ? `${p + 1}/` : ""}${n.lines.length} 行</option>`;
+    return `<option value="${n.id}" ${n.id === cur.id ? "selected" : ""}>${n.title}</option>`;
   }).join("");
   return `<div class="line"><label>小説</label><select id="n-sel">${opts}</select><button id="n-restart">最初から</button></div>` +
-    `<div class="note">小説モードでは1文ずつ順番に進み、続きは自動で保存されます（いま ${pos + 1} 行目）。本文は青空文庫より。読みがなは自動で付けたもので、まれに誤りがあります。</div>`;
+    `<div class="note">${cur.author}『${cur.title}』${cur.scope.replace(/[（）]/g, " ").trimEnd()} — 全 ${cur.lines.length} 行のうち ${pos + 1} 行目。1文ずつ順番に進み、続きは自動で保存されます。本文は青空文庫より。読みがなは自動で付けたもので、まれに誤りがあります。</div>`;
 }
 
 function render() {
@@ -57,9 +58,9 @@ function render() {
     `<div class="line"><label>フォント</label>${seg("fontTheme", LABELS.fontTheme)}</div>` +
     `<div class="line"><label>現在位置の表示</label>${seg("cursorStyle", LABELS.cursorStyle)}</div>` +
     range("uiScale", "全体の大きさ", 0.6, 1.3, 0.05, pct) +
-    range("fontSize", "文字サイズ", 16, 56, 1) +
+    range("fontSize", "文字サイズ", 16, 56, 1, px) +
     range("bgOpacity", "背景の濃さ", 0, 0.95, 0.01, pct) +
-    range("textOpacity", "全体の濃さ", 0.2, 1, 0.01, pct) +
+    range("textOpacity", "文字の濃さ", 0.2, 1, 0.01, pct) +
     toggle("dimWhenIdle", "タイピングしていない間は薄くする") +
     toggle("compact", "コンパクト表示（統計と次の文を隠す）");
 
@@ -103,10 +104,18 @@ function render() {
   };
 
   const m = isMac ? "⌘" : "Ctrl+";
-  $("keys").textContent =
-    `Ctrl+Alt+T   タイピング ⇄ ブラウザのフォーカス切替\nEsc  行の最初から / Tab  スキップ\n` +
-    `${m}1 ${m}2 ${m}3 ${m}4   日本語 / English / 小説 / カスタム\n${m},  設定 / ${m}S  統計・分析 / ${m}K  コンパクト表示 / ${m}G  キーボードガイド\n` +
-    `${m}V  クリップボード / ${m}O  ファイル\n${m}W  隠す / ${m}Q  終了\n右クリックでメニュー`;
+  const k = (...keys) => keys.map((x) => `<kbd>${x}</kbd>`).join("");
+  const rowsK = [
+    [k("Ctrl+Alt+T"), "タイピング ⇄ ブラウザを切り替え"],
+    [k("Esc"), "行の最初から"], [k("Tab"), "スキップ"],
+    [k(`${m}1`, `${m}2`, `${m}3`, `${m}4`), "日本語 / English / 小説 / カスタム"],
+    [k(`${m},`), "設定"], [k(`${m}S`), "統計・分析"],
+    [k(`${m}K`), "コンパクト表示"], [k(`${m}G`), "キーボードガイド"],
+    [k(`${m}V`), "クリップボードの文章で練習"], [k(`${m}O`), "テキストファイルで練習"],
+    [k(`${m}W`), "隠す"], [k(`${m}Q`), "終了"],
+    ["右クリック", "メニュー"],
+  ];
+  $("keys").innerHTML = rowsK.map(([a, b]) => `<div class="kk">${a}</div><div>${b}</div>`).join("");
 }
 
 store.subscribe((k) => { if (!document.activeElement || document.activeElement.type !== "range") render(); });

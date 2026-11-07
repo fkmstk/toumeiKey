@@ -186,7 +186,7 @@ function render() {
   const fingerRows = agg.map((s, i) => ({
     label: FINGER_NAMES[i], swatch: FINGER_COLORS[i], fraction: stat.missRate(s) / maxF,
     value: stat.attempts(s) ? `${(stat.missRate(s) * 100).toFixed(1)}%` : "–",
-    detail: stat.avgMs(s) != null ? `${stat.avgMs(s).toFixed(0)}ms` : "",
+    detail: stat.avgMs(s) != null ? `${stat.avgMs(s).toFixed(0)} ms` : "",
   }));
   html += `<div class="grid2">` + card("日別の正確率", "正しく打った数 ÷ 全打鍵", `<div class="chart" id="c-dacc"></div>`) +
     rankCard("指ごとのミス率", "右の数字は平均打鍵間隔（全期間）", fingerRows) + `</div>`;
@@ -269,7 +269,7 @@ function heatmap(layout) {
   const fmt = (v) => (heat === "miss" ? `${v.toFixed(0)}%` : v.toFixed(0));
   const cell = (label, s, w) => {
     const v = metric(s), t = v == null ? null : norm(v);
-    const title = `${label === "space" ? "スペース" : label}  打鍵 ${s.hits} / ミス ${s.misses} (${(stat.missRate(s) * 100).toFixed(1)}%)` + (stat.avgMs(s) != null ? `  平均 ${stat.avgMs(s).toFixed(0)}ms` : "");
+    const title = `${label === "space" ? "スペース" : label}  打鍵 ${s.hits} / ミス ${s.misses} (${(stat.missRate(s) * 100).toFixed(1)}%)` + (stat.avgMs(s) != null ? `  平均 ${stat.avgMs(s).toFixed(0)} ms` : "");
     return `<div class="k" title="${esc(title)}" style="width:${w}px;background:${t == null ? C.grid : rampColor(t)};color:${t == null ? C.muted : rampInk(t)}"><b>${esc(label)}</b><i>${v == null ? "–" : fmt(v)}</i></div>`;
   };
   const indent = [0, 0.5, 0.8, 1.3];
