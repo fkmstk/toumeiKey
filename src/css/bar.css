@@ -75,10 +75,10 @@ body { display: flex; flex-direction: column; justify-content: flex-end; height:
 
 /* ホバー時の操作 */
 .controls {
-  position: absolute; top: 8px; right: 8px; display: none; gap: 8px; align-items: center;
+  position: absolute; top: 8px; right: 8px; display: flex; opacity: 0.35; transition: opacity 0.15s ease; gap: 8px; align-items: center;
   padding: 4px 8px; border-radius: 14px; background: rgba(0, 0, 0, 0.6);
 }
-.card.hover .controls { display: flex; }
+.card.hover .controls, .card.focused .controls, .controls:hover { opacity: 1; }
 .controls button { background: none; border: 0; color: rgba(255, 255, 255, 0.85); font-size: 13px; padding: 2px 4px; border-radius: 6px; }
 .controls button:hover { background: rgba(255, 255, 255, 0.15); }
 .seg { display: flex; background: rgba(255, 255, 255, 0.1); border-radius: 7px; padding: 1px; }

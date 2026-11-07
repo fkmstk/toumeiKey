@@ -25,6 +25,7 @@
         "resizable": true,
         "shadow": false,
         "visibleOnAllWorkspaces": true,
+        "acceptFirstMouse": true,
         "visible": false
       }
     ],

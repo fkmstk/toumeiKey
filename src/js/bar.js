@@ -210,6 +210,8 @@ document.addEventListener("keydown", (e) => {
 window.addEventListener("focus", () => { focused = true; render(); });
 window.addEventListener("blur", () => { focused = false; render(); });
 document.addEventListener("mouseenter", () => { hovering = true; render(); });
+// 非アクティブなウィンドウでは mouseenter が来ないことがあるので mousemove でも拾う
+document.addEventListener("mousemove", () => { if (!hovering) { hovering = true; render(); } });
 document.addEventListener("mouseleave", () => { hovering = false; render(); });
 
 // 背景をドラッグして移動
